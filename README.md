@@ -17,7 +17,6 @@ This project is the third capstone for Java Development, focusing on building an
 * [Demonstration](#demonstration)
 * [Future Enhancements](#future-enhancements)
 * [Interesting Code Snippet](#interesting-code-snippet)
-* [License](#license)
 
 ## Project Description
 
