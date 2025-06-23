@@ -22,9 +22,15 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String color)
     {
         List<Product> products = new ArrayList<>();
+//        PROBLEM
+//It only filters by maxPrice if minPrice is the same as maxPrice. If you pass minPrice = 10
+// and maxPrice = 50, your query will only filter price <= 10 (or effectively price <= 10
+// if minPrice is not -1, otherwise no filter). It doesn't use maxPrice at all in the SQL
+// where clause.
 
         String sql = "SELECT * FROM products " +
                 "WHERE (category_id = ? OR ? = -1) " +
+                "   AND (price >= ? OR ? = -1)" +
                 "   AND (price <= ? OR ? = -1) " +
                 "   AND (color = ? OR ? = '') ";
 
@@ -36,12 +42,17 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
         try (Connection connection = getConnection())
         {
             PreparedStatement statement = connection.prepareStatement(sql);
+
             statement.setInt(1, categoryId);
             statement.setInt(2, categoryId);
+//            For min price
             statement.setBigDecimal(3, minPrice);
             statement.setBigDecimal(4, minPrice);
-            statement.setString(5, color);
-            statement.setString(6, color);
+//    For max price
+            statement.setBigDecimal(5, maxPrice);
+            statement.setBigDecimal(6, maxPrice);
+            statement.setString(7, color);
+            statement.setString(8, color);
 
             ResultSet row = statement.executeQuery();
 
