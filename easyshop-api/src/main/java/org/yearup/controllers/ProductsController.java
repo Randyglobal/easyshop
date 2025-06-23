@@ -77,15 +77,30 @@ public class ProductsController
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    PROBLEM
+//    uses the create method instead of the update method
+//    uses on the product as parameter instead of the id and product
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try
         {
-            productDao.create(product);
+            // Ensuring ID matches
+            if (product.getProductId() == 0){
+                product.setProductId(id);
+            }else if(product.getProductId() != id){
+                throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "product ID in path does not match ID in request body.");
+            }
+            Product existingProduct = productDao.getById(id);
+//            error exception
+            if (existingProduct == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category to be updated not found");
+            }
+            productDao.update(id, product);
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            System.err.println("Error updating product: " + ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not retrieve product.");
         }
     }
 

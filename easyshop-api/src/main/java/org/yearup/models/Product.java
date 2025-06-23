@@ -31,6 +31,9 @@ public class Product
         this.imageUrl = imageUrl;
     }
 
+    public Product(int productId, String oldName, BigDecimal bigDecimal) {
+    }
+
     public int getProductId()
     {
         return productId;
