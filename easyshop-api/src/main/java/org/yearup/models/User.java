@@ -1,13 +1,14 @@
 package org.yearup.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.yearup.models.authentication.Authority;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class User {
+public class User{
 
    private int id;
    private String username;

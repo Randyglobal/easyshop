@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,22 +21,25 @@ import org.yearup.models.authentication.LoginDto;
 import org.yearup.models.authentication.LoginResponseDto;
 import org.yearup.models.authentication.RegisterUserDto;
 import org.yearup.models.User;
+import org.yearup.models.authentication.UserDto;
 import org.yearup.security.jwt.JWTFilter;
 import org.yearup.security.jwt.TokenProvider;
 
 @RestController
 @CrossOrigin
-@PreAuthorize("permitAll()")
+//@PreAuthorize("permitAll()")
 public class AuthenticationController {
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final PasswordEncoder passwordEncoder;
     private UserDao userDao;
     private ProfileDao profileDao;
 
-    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDao userDao, ProfileDao profileDao) {
+    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder, UserDao userDao, ProfileDao profileDao) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.passwordEncoder = passwordEncoder;
         this.userDao = userDao;
         this.profileDao = profileDao;
     }
@@ -67,8 +71,10 @@ public class AuthenticationController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto newUser) {
+//    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @PostMapping("/register")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserDto newUser) {
 
         try
         {
@@ -77,6 +83,8 @@ public class AuthenticationController {
             {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Already Exists.");
             }
+//            encrypting password before sending
+//            String hashedPassword = passwordEncoder.encode(newUser.getPassword());
 
             // create user
             User user = userDao.create(new User(0, newUser.getUsername(), newUser.getPassword(), newUser.getRole()));
@@ -86,10 +94,12 @@ public class AuthenticationController {
             profile.setUserId(user.getId());
             profileDao.create(profile);
 
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
+            UserDto responseUserDto = new UserDto(user.getId(), user.getUsername(), user.getRole());
+            return new ResponseEntity<>(responseUserDto, HttpStatus.CREATED);
         }
         catch (Exception e)
         {
+            System.err.println("Registration error: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }

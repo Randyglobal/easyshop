@@ -1,8 +1,10 @@
 package org.yearup.models.authentication;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import java.util.Objects;
 
-public class Authority {
+public class Authority implements GrantedAuthority {
 
    private String name;
 
@@ -36,5 +38,10 @@ public class Authority {
       return "Authority{" +
          "name=" + name +
          '}';
+   }
+
+   @Override
+   public String getAuthority() {
+      return name;
    }
 }
