@@ -70,29 +70,82 @@ public class CategoriesController
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
-        return null;
+        try {
+            Category category = categoryDao.getById(categoryId);
+            if (category == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found with ID: " + categoryId);
+            }
+            return productDao.listByCategoryId(categoryId);
+        }catch (Exception e){
+            System.err.println("Error fetching product for categories: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not retrieve categories.");
+        }
     }
 
     // add annotation to call this method for a POST action
     // add annotation to ensure that only an ADMIN can call this function
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public Category addCategory(@RequestBody Category category)
     {
         // insert the category
-        return null;
+        try {
+            return categoryDao.create(category);
+        }catch (Exception e){
+            System.err.println("Error adding categories: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not retrieve categories.");
+        }
     }
 
     // add annotation to call this method for a PUT (update) action - the url path must include the categoryId
     // add annotation to ensure that only an ADMIN can call this function
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
         // update the category by id
+        try {
+            // Ensuring ID matches
+            if (category.getCategoryId() == 0){
+                category.setCategoryId(id);
+            }else if(category.getCategoryId() != id){
+                throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category ID in path does not match ID in request body.");
+            }
+            Category existingCategory = categoryDao.getById(id);
+//            error exception
+            if (existingCategory == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category to be updated not found");
+            }
+            categoryDao.update(id, category);
+        }catch (ResponseStatusException e){
+            throw new RuntimeException(e);
+        }
+        catch (Exception e){
+            System.err.println("Error updating categories: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not retrieve categories.");
+        }
     }
 
 
     // add annotation to call this method for a DELETE action - the url path must include the categoryId
     // add annotation to ensure that only an ADMIN can call this function
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCategory(@PathVariable int id)
     {
         // delete the category by id
+        try {
+            Category existingCategory = categoryDao.getById(id);
+//            error exception
+            if (existingCategory == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category to be deleted not found");
+            }
+            categoryDao.delete(id);
+        }catch (Exception e){
+            System.err.println("Error deleting categories: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not retrieve categories.");
+        }
     }
 }
