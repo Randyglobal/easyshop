@@ -13,11 +13,11 @@ import org.yearup.models.Product;
 import java.util.List;
 
 // add the annotations to make this a REST controller
-// add the annotation to make this controller the endpoint for the following url
-    // http://localhost:8080/categories
-// add annotation to allow cross site origin requests
 @RestController
+// add the annotation to make this controller the endpoint for the following url
 @RequestMapping("categories")
+// add annotation to allow cross site origin requests
+//tells the browser that it's safe for your backend to accept requests from origins other than its own
 @CrossOrigin
 public class CategoriesController
 {

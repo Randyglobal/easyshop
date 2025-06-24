@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-//@BeforeEach to mark a method that runs before every test method. This is for common setup.
+//@moke is a fake version of an object
 @ExtendWith(MockitoExtension.class)
 class ProductsControllerTest {
 
@@ -27,9 +27,10 @@ class ProductsControllerTest {
     @InjectMocks
     private ProductsController productsController;
 
+    //@BeforeEach to mark a method that runs before every test method. This is for common setup.
     @BeforeEach
     void setUp() {
-        // setup, needed for the test to run
+
     }
 
 //    test annotation
@@ -41,13 +42,13 @@ class ProductsControllerTest {
         Product updatedProduct = new Product(productId, "New Name", BigDecimal.valueOf(15.00));
 
 //        These lines are Mockito stubbing statements :
-//        They define the behavior of your productDao mock object when certain methods are called during the test
+//        They define the behavior of the productDao mock object when certain methods are called during the test
         when(productDao.getById(productId)).thenReturn(existingProduct);
         doNothing().when(productDao).update(productId, updatedProduct);
 
         // Act & Assert
 //        Execute the productsController.updateProduct(productId, updatedProduct) method.
-//        If this method completes successfully without throwing any kind of Throwable
+//        If this method completes successfully without throwing any kind of issue
         assertDoesNotThrow(() -> productsController.updateProduct(productId, updatedProduct));
 
 //        his ensures that your controller's logic correctly attempted to retrieve the

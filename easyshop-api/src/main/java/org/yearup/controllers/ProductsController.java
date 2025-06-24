@@ -79,7 +79,7 @@ public class ProductsController
     @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    PROBLEM
 //    uses the create method instead of the update method
-//    uses on the product as parameter instead of the id and product
+//    uses only the product as parameter instead of the id and product
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try

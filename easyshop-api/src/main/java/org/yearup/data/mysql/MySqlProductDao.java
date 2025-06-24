@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Component
 public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 {
@@ -24,7 +25,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
         List<Product> products = new ArrayList<>();
 //        PROBLEM
 //It only filters by maxPrice if minPrice is the same as maxPrice. If you pass minPrice = 10
-// and maxPrice = 50, your query will only filter price <= 10 (or effectively price <= 10
+// and maxPrice = 50, the query will only filter price <= 10 (or effectively price <= 10
 // if minPrice is not -1, otherwise no filter). It doesn't use maxPrice at all in the SQL
 // where clause.
 
