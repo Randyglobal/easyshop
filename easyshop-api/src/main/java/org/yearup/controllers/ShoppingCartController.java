@@ -86,19 +86,7 @@ public class ShoppingCartController {
             if (product == null){
                 throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with ID " + productId + " not found.");
             }
-//            get the current cart
-//            ShoppingCart cart = shoppingCartDao.getByUserId(userId);
-//            if (cart == null){
-//                return new ShoppingCart();
-//            }
-
-//            checking if the product exist to increment the quantity
-//            ShoppingCartItem existingItem = shoppingCartDao.getCartItemByUserIdAndProductId(userId, productId);
-//            if (existingItem == null){
                 shoppingCartDao.addProductToCart(userId, productId);
-//            }else {
-//                shoppingCartDao.updateProductQuantity(userId, productId, existingItem.getQuantity());
-//            }
 //            returning updated cart
             return shoppingCartDao.getByUserId(userId);
 
