@@ -38,6 +38,7 @@ public class ShoppingCartController {
 
 
     // each method in this controller requires a Principal object as a parameter
+    @GetMapping
     public ShoppingCart getCart(Principal principal)
     {
         try
@@ -111,9 +112,58 @@ public class ShoppingCartController {
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    public ShoppingCart updateProductCart(@PathVariable int productId, @RequestBody ShoppingCartItem item, Principal principal){
+        try {
+            // get the currently logged in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            if (user == null){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found for authenticated principal.");
+            }
+            int userId = user.getId();
+//            checking if the product exist to increment the quantity
+            ShoppingCartItem existingItem = shoppingCartDao.getCartItemByUserIdAndProductId(userId, productId);
+            if (existingItem == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+            }
+            if (item.getQuantity() == 0){
+//                preferred thing to do is to add a delete method to delete the product
+                shoppingCartDao.updateProductQuantity(userId, productId, 0);
+            }else {
+//                updating the quantity directly if item exist in cart
+                shoppingCartDao.updateProductQuantity(userId, productId, item.getQuantity());
+            }
+//            returning the updated cart
+            return shoppingCartDao.getByUserId(userId);
+
+        }catch (Exception e){
+            System.err.println("Error adding product to cart: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not update product to cart.");
+        }
+    }
 
 
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearCart(Principal principal){
+        try {
+            // get the currently logged in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            if (user == null){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found for authenticated principal.");
+            }
+            int userId = user.getId();
+
+            shoppingCartDao.clearCart(userId);
+        }catch (Exception e){
+            System.err.println("Error adding product to cart: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not delete product to cart.");
+        }
+    }
 
 }
