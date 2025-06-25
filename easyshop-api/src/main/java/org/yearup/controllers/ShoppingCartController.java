@@ -87,18 +87,18 @@ public class ShoppingCartController {
                 throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with ID " + productId + " not found.");
             }
 //            get the current cart
-            ShoppingCart cart = shoppingCartDao.getByUserId(userId);
-            if (cart == null){
-                return new ShoppingCart();
-            }
+//            ShoppingCart cart = shoppingCartDao.getByUserId(userId);
+//            if (cart == null){
+//                return new ShoppingCart();
+//            }
 
 //            checking if the product exist to increment the quantity
-            ShoppingCartItem existingItem = shoppingCartDao.getCartItemByUserIdAndProductId(userId, productId);
-            if (existingItem == null){
+//            ShoppingCartItem existingItem = shoppingCartDao.getCartItemByUserIdAndProductId(userId, productId);
+//            if (existingItem == null){
                 shoppingCartDao.addProductToCart(userId, productId);
-            }else {
-                shoppingCartDao.updateProductQuantity(userId, productId, existingItem.getQuantity());
-            }
+//            }else {
+//                shoppingCartDao.updateProductQuantity(userId, productId, existingItem.getQuantity());
+//            }
 //            returning updated cart
             return shoppingCartDao.getByUserId(userId);
 
@@ -112,11 +112,10 @@ public class ShoppingCartController {
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    @PutMapping("products/{productId}")
     public ShoppingCart updateProductCart(@PathVariable int productId, @RequestBody ShoppingCartItem item, Principal principal){
         try {
-            // get the currently logged in username
             String userName = principal.getName();
-            // find database user by userId
             User user = userDao.getByUserName(userName);
             if (user == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found for authenticated principal.");
@@ -127,17 +126,19 @@ public class ShoppingCartController {
             if (existingItem == null){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
             }
-            if (item.getQuantity() == 0){
+            if (item.getQuantity() < 0){
 //                preferred thing to do is to add a delete method to delete the product
-                shoppingCartDao.updateProductQuantity(userId, productId, 0);
-            }else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantity cannot be negative.");
+            }
 //                updating the quantity directly if item exist in cart
                 shoppingCartDao.updateProductQuantity(userId, productId, item.getQuantity());
-            }
 //            returning the updated cart
             return shoppingCartDao.getByUserId(userId);
 
-        }catch (Exception e){
+        }catch (ResponseStatusException e){
+            throw e;
+        }
+        catch (Exception e){
             System.err.println("Error adding product to cart: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Could not update product to cart.");
         }
