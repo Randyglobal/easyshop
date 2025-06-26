@@ -87,7 +87,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     public void update(int categoryId, Category category)
     {
         // update category
-        String sql = "UPDATE categories SET name = ?, description = ? WHERE categories_id = ?";
+        String sql = "UPDATE categories SET name = ?, description = ? WHERE category_id = ? ";
         try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, category.getName());
@@ -108,7 +108,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     public void delete(int categoryId)
     {
         // delete category
-        String sql = "DELETE FROM categories WHERE category_id = ?";
+        String sql = "DELETE FROM categories WHERE category_id = ? ";
         try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, categoryId); // Using the ID from the path

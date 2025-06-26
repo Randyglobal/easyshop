@@ -23,7 +23,6 @@ import java.security.Principal;
 @PreAuthorize("isAuthenticated()")
 @CrossOrigin
 public class ShoppingCartController {
-    // a shopping cart requires
     private ShoppingCartDao shoppingCartDao;
     private UserDao userDao;
     private ProductDao productDao;

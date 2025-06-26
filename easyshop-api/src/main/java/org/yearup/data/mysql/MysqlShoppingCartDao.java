@@ -15,12 +15,11 @@ import java.sql.SQLException;
 import static org.yearup.data.mysql.MySqlProductDao.mapRow;
 
 @Repository
-public class MysqlShoppingCartDao implements ShoppingCartDao {
+public class MysqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao {
 
-    private DataSource dataSource;
 
     public MysqlShoppingCartDao(DataSource dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
     @Override
@@ -31,7 +30,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
                     "JOIN products p ON sc.product_id = p.product_id " +
                     "WHERE sc.user_id = ?";
 
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
 
@@ -53,7 +52,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
         String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) " +
                 "VALUES (?, ?, 1) " +
                 "ON DUPLICATE KEY UPDATE quantity = quantity + 1";
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
             statement.setInt(2, productId);
@@ -68,7 +67,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
     //    deleting product when quantity is being reduced
     private void clearCartItem(int userId, int productId){
         String sql = "DELETE FROM shopping_cart WHERE user_id = ? AND product_id = ?";
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
             statement.setInt(2, productId);
@@ -87,7 +86,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
         }
 
         String sql = "UPDATE shopping_cart SET quantity = ? WHERE user_id = ? AND product_id = ? ";
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, quantity);
             statement.setInt(2, userId);
@@ -104,7 +103,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
     @Override
     public void clearCart(int userId) {
         String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
             statement.executeUpdate();
@@ -121,7 +120,7 @@ public class MysqlShoppingCartDao implements ShoppingCartDao {
                       "JOIN products p ON sc.product_id = p.product_id " +
                      "WHERE sc.user_id = ? AND sc.product_id = ?";
 
-        try(Connection connection = dataSource.getConnection()) {
+        try(Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
             statement.setInt(2, productId);
