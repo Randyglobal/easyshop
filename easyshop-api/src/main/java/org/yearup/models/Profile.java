@@ -118,4 +118,19 @@ public class Profile
     {
         this.zip = zip;
     }
+
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", zip='" + zip + '\'' +
+                '}';
+    }
 }
